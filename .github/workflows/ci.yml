@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
+      - run: cargo fmt --check
+      - run: cargo clippy --all-targets -- -D warnings
+      - run: cargo test
+      - run: cargo check --no-default-features --features native-tls
+      - run: cargo check --no-default-features --features rustls
+  rmcp-3-0:
+    # The oldest rmcp the crate takes, with its own rmcp-macros.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - run: cargo generate-lockfile && cargo update -p rmcp --precise 3.0.1 && cargo update -p rmcp-macros --precise 3.0.1
+      - run: cargo test
+  msrv:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@1.88
+      - run: cargo check --all-targets

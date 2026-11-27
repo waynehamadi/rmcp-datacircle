@@ -1,0 +1,38 @@
+[package]
+name = "rmcp-datacircle"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.88"
+description = "Datacircle's open API as four tools for rmcp, the official Rust MCP SDK: find the best GTM APIs, their plans, prices and providers. No key."
+license = "MIT"
+repository = "https://github.com/waynehamadi/rmcp-datacircle"
+homepage = "https://datacircle.dev"
+readme = "README.md"
+keywords = ["mcp", "rmcp", "tools", "gtm", "api"]
+categories = ["api-bindings", "web-programming::http-client"]
+exclude = [".github"]
+
+[features]
+default = ["rustls", "stdio"]
+# The TLS of the calls to the API, as reqwest's own features name them.
+rustls = ["reqwest/rustls"]
+native-tls = ["reqwest/native-tls"]
+# The datacircle-mcp binary, a stdio server of the four tools.
+stdio = ["rmcp/transport-io", "tokio/macros", "tokio/rt-multi-thread"]
+
+[[bin]]
+name = "datacircle-mcp"
+required-features = ["stdio"]
+
+[dependencies]
+rmcp = { version = "3", default-features = false, features = ["server"] }
+reqwest = { version = "0.13", default-features = false, features = ["charset", "http2", "system-proxy"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = "2"
+tokio = { version = "1", features = ["time"] }
+unicode-normalization = "0.1"
+
+[dev-dependencies]
+rmcp = { version = "3", default-features = false, features = ["server", "client", "macros", "transport-io", "transport-child-process"] }
+tokio = { version = "1", features = ["macros", "rt-multi-thread", "net", "io-util", "time", "process"] }
